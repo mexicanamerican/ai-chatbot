@@ -1,6 +1,6 @@
 'use client';
 
-import type { ChatRequestOptions, CreateMessage, Message } from 'ai';
+import type { Message } from 'ai';
 import cx from 'classnames';
 import {
   AnimatePresence,
@@ -25,18 +25,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { sanitizeUIMessages } from '@/lib/utils';
 
-import {
-  ArrowUpIcon,
-  CodeIcon,
-  LogsIcon,
-  MessageIcon,
-  PenIcon,
-  SparklesIcon,
-  StopIcon,
-  SummarizeIcon,
-} from './icons';
+import { ArrowUpIcon, StopIcon, SummarizeIcon } from './icons';
 import { artifactDefinitions, ArtifactKind } from './artifact';
 import { ArtifactToolbarItem } from './create-artifact';
 import { UseChatHelpers } from '@ai-sdk/react';
@@ -49,10 +39,7 @@ type ToolProps = {
   isToolbarVisible?: boolean;
   setIsToolbarVisible?: Dispatch<SetStateAction<boolean>>;
   isAnimating: boolean;
-  append: (
-    message: Message | CreateMessage,
-    chatRequestOptions?: ChatRequestOptions,
-  ) => Promise<string | null | undefined>;
+  append: UseChatHelpers['append'];
   onClick: ({
     appendMessage,
   }: {
@@ -153,10 +140,7 @@ const ReadingLevelSelector = ({
 }: {
   setSelectedTool: Dispatch<SetStateAction<string | null>>;
   isAnimating: boolean;
-  append: (
-    message: Message | CreateMessage,
-    chatRequestOptions?: ChatRequestOptions,
-  ) => Promise<string | null | undefined>;
+  append: UseChatHelpers['append'];
 }) => {
   const LEVELS = [
     'Elementary',
@@ -267,10 +251,7 @@ export const Tools = ({
   isToolbarVisible: boolean;
   selectedTool: string | null;
   setSelectedTool: Dispatch<SetStateAction<string | null>>;
-  append: (
-    message: Message | CreateMessage,
-    chatRequestOptions?: ChatRequestOptions,
-  ) => Promise<string | null | undefined>;
+  append: UseChatHelpers['append'];
   isAnimating: boolean;
   setIsToolbarVisible: Dispatch<SetStateAction<boolean>>;
   tools: Array<ArtifactToolbarItem>;
@@ -329,7 +310,7 @@ const PureToolbar = ({
   status: UseChatHelpers['status'];
   append: UseChatHelpers['append'];
   stop: UseChatHelpers['stop'];
-  setMessages: Dispatch<SetStateAction<Message[]>>;
+  setMessages: UseChatHelpers['setMessages'];
   artifactKind: ArtifactKind;
 }) => {
   const toolbarRef = useRef<HTMLDivElement>(null);
@@ -442,7 +423,7 @@ const PureToolbar = ({
             className="p-3"
             onClick={() => {
               stop();
-              setMessages((messages) => sanitizeUIMessages(messages));
+              setMessages((messages) => messages);
             }}
           >
             <StopIcon />
